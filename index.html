@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sensoren auslesen</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var updateInterval;
+      window.addEventListener("deviceorientation", handleOrientation, true);
+      window.addEventListener("devicemotion", handleMotion, true);
+      
+      $("#startBtn").click(function() {
+        var updateFreq = parseInt($("#updateFreq").val()) || 10; // Default update frequency is 10 seconds
+        updateInterval = setInterval(getLocation, updateFreq * 1000);
+      });
+
+      $("#stopBtn").click(function() {
+        clearInterval(updateInterval);
+      });
+
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+
+      function handleOrientation(event) {
+      var alpha = event.alpha; // Z-Achse (Yaw)
+      var beta = event.beta; // X-Achse (Pitch)
+      var gamma = event.gamma; // Y-Achse (Roll)
+      // console.log("alpha: " + alpha + ", beta: " + beta + ", gamma: " + gamma);
+      $("#alpha").html(alpha.toFixed(2)+"°");
+      $("#beta").html(beta.toFixed(2)+"°");
+      $("#gamma").html(gamma.toFixed(2)+"°");
+      }
+
+      function handleMotion(event) {
+      var acceleration = event.acceleration; // Beschleunigungsvektor
+      var x = acceleration.x; // Beschleunigung in x-Richtung
+      var y = acceleration.y; // Beschleunigung in y-Richtung
+      var z = acceleration.z; // Beschleunigung in z-Richtung
+      $("#acc_x").html(x.toFixed(2)+"m/s²");
+      $("#acc_y").html(y.toFixed(2)+"m/s²");
+      $("#acc_z").html(z.toFixed(2)+"m/s²");
+      }
+
+      function showPosition(position) {
+        $("#latitude").html(position.coords.latitude+"°");
+        $("#longitude").html(position.coords.longitude+"°");
+        $("#time").html(Date.now()+"ms");
+      }
+    });
+
+      // Request permission for iOS 13+ devices
+  if (
+    DeviceMotionEvent &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    DeviceMotionEvent.requestPermission();
+  };
+
+  </script>
+</head>
+<body>
+  <h1>Sensoren im Smartphone</h1>
+
+  <h2>Positionsbestimmung (GNSS)</h2>
+  <p>Latitude: <span id="latitude"></span></p>
+  <p>Longitude: <span id="longitude"></span></p>
+  <p>Time: <span id="time"></span></p>
+  <label>Update Frequenz [s]:</label>
+  <input type="number" id="updateFreq" value="1">
+  <button id="startBtn">Start</button>
+  <button id="stopBtn">Stop</button>
+
+  <h2>Orientierung (Gyroskop)</h2>
+  <p>Alpha: <span id="alpha"></span></p>
+  <p>Beta: <span id="beta"></span></p>
+  <p>Gamma: <span id="gamma"></span></p>
+
+  <h2>Beschleunigung (Beschleunigungssensor)</h2>
+  <p>X-Achse: <span id="acc_x"></span></p>
+  <p>Y-Achse: <span id="acc_y"></span></p>
+  <p>Z-Achse: <span id="acc_z"></span></p>
+
+
+</body>
+</html>
