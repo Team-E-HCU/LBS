@@ -19,7 +19,7 @@
       $("#startButton").click(function() {
         console.log("Start listening...");
         isReadingSensors = true;
-        sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
+        sensorInterval = setInterval(readSensors, 1000); // Sensoren alle 1 ms auslesen
       });
 
       // Event Listener für Stop-Button
