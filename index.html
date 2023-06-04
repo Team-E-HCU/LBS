@@ -31,6 +31,19 @@
           window.removeEventListener("devicemotion", handleMotion, true);
 
           console.log(sensorData);
+          if (sensorData.length > 0) {
+          var sensorDataStr = sensorData.map(function(data) {
+            return data.join(", ");
+          }).join("\n");
+          var blob = new Blob([sensorDataStr], { type: "text/plain" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "sensor_data.txt";
+          link.click();
+          sensorData = [];
+
+        }
       });
 
       function readSensors() {
