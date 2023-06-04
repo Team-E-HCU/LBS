@@ -54,10 +54,7 @@
         var gamma = event.gamma; // Y-Achse (Roll)
         var time = Date.now(); // Zeitstempel
 
-        var acceleration = event.acceleration; // Beschleunigungsvektor
-        var x = acceleration.x; // Beschleunigung in x-Richtung
-
-        sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, x: x, time: time });
+        sensorData.push({ time: time, alpha: alpha, beta: beta, gamma: gamma });
         $("#alpha").html(alpha.toFixed(2));
         $("#beta").html(beta.toFixed(2));
         $("#gamma").html(gamma.toFixed(2));
@@ -69,6 +66,8 @@
         var x = acceleration.x; // Beschleunigung in x-Richtung
         var y = acceleration.y; // Beschleunigung in y-Richtung
         var z = acceleration.z; // Beschleunigung in z-Richtung
+
+        sensorData.push({ x: x, y: y, z: z});
         $("#acc_x").html(x.toFixed(2) + "m/s²");
         $("#acc_y").html(y.toFixed(2) + "m/s²");
         $("#acc_z").html(z.toFixed(2) + "m/s²");
