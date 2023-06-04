@@ -15,6 +15,7 @@
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
       var accData = "";
       var orientationData = "";
+      var output = "";
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
@@ -32,7 +33,9 @@
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
 
-        accData += orientationData;
+        output = "Acceleration Data: Time, x, y, z \n";
+        output += accData + "\n" + "Orientation Data: Time, alpha, beta, gamma \n" + orientationData;
+
         var blob_acc = new Blob([accData], { type: "text/plain" });
         var url_acc = URL.createObjectURL(blob_acc);
         var link_acc = document.createElement("a");
