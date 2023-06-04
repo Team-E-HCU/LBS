@@ -57,7 +57,8 @@
         var alpha = event.alpha; // Z-Achse (Yaw)
         var beta = event.beta; // X-Achse (Pitch)
         var gamma = event.gamma; // Y-Achse (Roll)
-        sensorData.push([time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2)]);
+        var sensorEntry = [time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2)];
+        appendToSensorData(sensorEntry);
         $("#alpha").html(alpha.toFixed(2));
         $("#beta").html(beta.toFixed(2));
         $("#gamma").html(gamma.toFixed(2));
@@ -69,10 +70,15 @@
         var x = acceleration.x; // Beschleunigung in x-Richtung
         var y = acceleration.y; // Beschleunigung in y-Richtung
         var z = acceleration.z; // Beschleunigung in z-Richtung
-        sensorData.push([time, x.toFixed(2), y.toFixed(2), z.toFixed(2)]);
+        var sensorEntry = [time, x.toFixed(2), y.toFixed(2), z.toFixed(2)];
+        appendToSensorData(sensorEntry);
         $("#acc_x").html(x.toFixed(2));
         $("#acc_y").html(y.toFixed(2));
         $("#acc_z").html(z.toFixed(2));
+      }
+
+      function appendToSensorData(entry) {
+        sensorData.push(entry);
       }
     });
 
