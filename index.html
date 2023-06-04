@@ -6,8 +6,30 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
-      window.addEventListener("deviceorientation", handleOrientation, true);
-      window.addEventListener("devicemotion", handleMotion, true);
+      var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
+      var sensorInterval; // Variable für das Intervall der Sensorauslesung
+
+      // Event Listener für Start-Button
+      $("#startButton").click(function() {
+        if (!isReadingSensors) { // Überprüfen, ob die Sensoren bereits ausgelesen werden
+          isReadingSensors = true;
+          sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
+        }
+      });
+
+      // Event Listener für Stop-Button
+      $("#stopButton").click(function() {
+        if (isReadingSensors) { // Überprüfen, ob die Sensoren aktuell ausgelesen werden
+          isReadingSensors = false;
+          clearInterval(sensorInterval); // Sensorausleseintervall beenden
+        }
+      });
+
+      function readSensors() {
+        // Funktion zum Auslesen der Sensoren
+        window.addEventListener("deviceorientation", handleOrientation, true);
+        window.addEventListener("devicemotion", handleMotion, true);
+      }
 
       function handleOrientation(event) {
       var alpha = event.alpha; // Z-Achse (Yaw)
@@ -56,6 +78,8 @@
   <p>Y-Achse: <span id="acc_y"></span></p>
   <p>Z-Achse: <span id="acc_z"></span></p>
 
+  <button id="startButton">Start</button>
+  <button id="stopButton">Stop</button>
 
 </body>
 </html>
