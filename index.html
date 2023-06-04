@@ -13,13 +13,14 @@
     $(document).ready(function() {
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
-      var sensorData = []; // Array zur Speicherung der Sensordaten
+      var sensorData = ""; // Speicherung der Sensordaten
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
-        console.log("Start listening...");
-        isReadingSensors = true;
-        sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
+          console.log("start listening...");
+          isReadingSensors = true;
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("devicemotion", handleMotion, true);
       });
 
       // Event Listener für Stop-Button
@@ -29,80 +30,69 @@
         clearInterval(sensorInterval); // Sensorausleseintervall beenden
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
-        if (sensorData.length > 0) {
-          var sensorDataStr = sensorData.map(function(data) {
-            return data.join(", ");
-          }).join("\n");
-          var blob = new Blob([sensorDataStr], { type: "text/plain" });
-          var url = URL.createObjectURL(blob);
-          var link = document.createElement("a");
-          link.href = url;
-          link.download = "sensor_data.txt";
-          link.click();
-        }
+
+        var blob = new Blob([sensorData], { type: "text/plain" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = "sensor_data.txt";
+        link.click();
       });
 
-      function readSensors() {
-        // Funktion zum Auslesen der Sensoren
-        var time = Date.now(); // Aktuellen Zeitstempel ermitteln
-        window.addEventListener("deviceorientation", function(event) {
-          handleOrientation(event, time);
-        }, true);
-        window.addEventListener("devicemotion", function(event) {
-          handleMotion(event, time);
-        }, true);
+      function handleOrientation(event) {
+      var alpha = event.alpha; // Z-Achse (Yaw)
+      var beta = event.beta; // X-Achse (Pitch)
+      var gamma = event.gamma; // Y-Achse (Roll)
+      //sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
+      sensorData += Date.now() + "," + alpha + "," + beta + "," + gamma + ",";
+      $("#alpha").html(alpha.toFixed(2)+"°");
+      $("#beta").html(beta.toFixed(2)+"°");
+      $("#gamma").html(gamma.toFixed(2)+"°");
+      $("#time").html(Date.now()+"ms");
       }
 
-      function handleOrientation(event, time) {
-        var alpha = event.alpha; // Z-Achse (Yaw)
-        var beta = event.beta; // X-Achse (Pitch)
-        var gamma = event.gamma; // Y-Achse (Roll)
-        sensorData.push([time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2)]);
-        $("#alpha").html(alpha.toFixed(2));
-        $("#beta").html(beta.toFixed(2));
-        $("#gamma").html(gamma.toFixed(2));
-        $("#time").html(time + "ms");
-      }
-
-      function handleMotion(event, time) {
-        var acceleration = event.acceleration; // Beschleunigungsvektor
-        var x = acceleration.x; // Beschleunigung in x-Richtung
-        var y = acceleration.y; // Beschleunigung in y-Richtung
-        var z = acceleration.z; // Beschleunigung in z-Richtung
-        sensorData.push([time, x.toFixed(2), y.toFixed(2), z.toFixed(2)]);
-        $("#acc_x").html(x.toFixed(2));
-        $("#acc_y").html(y.toFixed(2));
-        $("#acc_z").html(z.toFixed(2));
+      function handleMotion(event) {
+      var acceleration = event.acceleration; // Beschleunigungsvektor
+      var x = acceleration.x; // Beschleunigung in x-Richtung
+      var y = acceleration.y; // Beschleunigung in y-Richtung
+      var z = acceleration.z; // Beschleunigung in z-Richtung
+      //sensorData.push({ x: x, y: y, z: z});
+      sensorData += x + "," + y + "," + z + "\n";
+      $("#acc_x").html(x.toFixed(2)+"m/s²");
+      $("#acc_y").html(y.toFixed(2)+"m/s²");
+      $("#acc_z").html(z.toFixed(2)+"m/s²");
       }
     });
 
-    // Request permission for iOS 13+ devices
-    if (
-      DeviceMotionEvent &&
-      typeof DeviceMotionEvent.requestPermission === "function"
-    ) {
-      DeviceMotionEvent.requestPermission();
-    };
+  // Request permission for iOS 13+ devices
+  if (
+    DeviceMotionEvent &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    DeviceMotionEvent.requestPermission();
+  };
   </script>
 </head>
 <body>
-<h1>Sensoren im Smartphone</h1>
+  <h1>Sensoren im Smartphone</h1>
 
-<button id="startButton">Start</button>
-<button id="stopButton">Stop</button>
+  <button id="startButton">Start</button>
+  <button id="stopButton">Stop</button>
 
-<h2>Zeit</h2>
-<p>Time: <span id="time" class="sensor-value"></span></p>
+  <h2>Zeit</h2>
+  <p>Time: <span id="time" class="sensor-value"></span></p>
 
-<h2>Orientierung (Gyroskop)</h2>
-<p>Alpha: <span id="alpha" class="sensor-value"></span></p>
-<p>Beta: <span id="beta" class="sensor-value"></span></p>
-<p>Gamma: <span id="gamma" class="sensor-value"></span></p>
+  <h2>Orientierung (Gyroskop)</h2>
+  <p>Alpha: <span id="alpha" class="sensor-value"></span></p>
+  <p>Beta: <span id="beta" class="sensor-value"></span></p>
+  <p>Gamma: <span id="gamma" class="sensor-value"></span></p>
 
-<h2>Beschleunigung (Beschleunigungssensor)</h2>
-<p>X-Achse: <span id="acc_x" class="sensor-value"></span></p>
-<p>Y-Achse: <span id="acc_y" class="sensor-value"></span></p>
-<p>Z-Achse: <span id="acc_z" class="sensor-value"></span></p>
+  <h2>Beschleunigung (Beschleunigungssensor)</h2>
+  <p>X-Achse: <span id="acc_x" class="sensor-value"></span></p>
+  <p>Y-Achse: <span id="acc_y" class="sensor-value"></span></p>
+  <p>Z-Achse: <span id="acc_z" class="sensor-value"></span></p>
+
+
 
 </body>
 </html>
