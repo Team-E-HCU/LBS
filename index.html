@@ -19,7 +19,8 @@
       $("#startButton").click(function() {
           console.log("start listening...");
           isReadingSensors = true;
-          sensorInterval = setInterval(readSensors, 10); // Sensoren alle 10 ms auslesen
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("devicemotion", handleMotion, true);
       });
 
       // Event Listener für Stop-Button
@@ -30,17 +31,6 @@
           window.removeEventListener("deviceorientation", handleOrientation, true);
           window.removeEventListener("devicemotion", handleMotion, true);
       });
-
-      function readSensors() {
-        // Funktion zum Auslesen der Sensoren
-        var time = Date.now(); // Aktuellen Zeitstempel ermitteln
-        window.addEventListener("deviceorientation", function(event) {
-          handleOrientation(event, time);
-        }, true);
-        window.addEventListener("devicemotion", function(event) {
-          handleMotion(event, time);
-        }, true);
-      }
 
       function handleOrientation(event) {
       var alpha = event.alpha; // Z-Achse (Yaw)
