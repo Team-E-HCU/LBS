@@ -51,6 +51,7 @@
         window.addEventListener("devicemotion", function(event) {
           handleMotion(event, time);
         }, true);
+        setTimeout(readSensors, 10); // Sensoren alle 10 ms auslesen
       }
 
       function handleOrientation(event, time) {
