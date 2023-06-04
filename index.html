@@ -13,7 +13,8 @@
     $(document).ready(function() {
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
-      var sensorData = ""; // Speicherung der Sensordaten
+      var accData = "";
+      var orientationData = "";
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
@@ -31,12 +32,22 @@
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
 
-        var blob = new Blob([sensorData], { type: "text/plain" });
+        var blob = new Blob([accData], { type: "text/plain" });
         var url = URL.createObjectURL(blob);
         var link = document.createElement("a");
         link.href = url;
         link.download = "sensor_data.txt";
         link.click();
+
+        var blob = new Blob([orientationData], { type: "text/plain" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = "sensor_data.txt";
+        link.click();
+
+        accData = "";
+        orientationData = "";
       });
 
       function handleOrientation(event) {
@@ -44,7 +55,7 @@
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
       //sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
-      sensorData += Date.now() + "," + alpha + "," + beta + "," + gamma + ",";
+      orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma;
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
       $("#gamma").html(gamma.toFixed(2)+"°");
@@ -57,7 +68,7 @@
       var y = acceleration.y; // Beschleunigung in y-Richtung
       var z = acceleration.z; // Beschleunigung in z-Richtung
       //sensorData.push({ x: x, y: y, z: z});
-      sensorData += x + "," + y + "," + z + "\n";
+      accData += Date.now() + "," + x + "," + y + "," + z;
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
       $("#acc_z").html(z.toFixed(2)+"m/s²");
