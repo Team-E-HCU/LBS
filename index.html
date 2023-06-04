@@ -13,12 +13,13 @@
     $(document).ready(function() {
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
+      var sensorData = []; // Speicherung der Sensordaten
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
           console.log("start listening...");
           isReadingSensors = true;
-          sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
+          sensorInterval = setInterval(readSensors, 10); // Sensoren alle 10 ms auslesen
       });
 
       // Event Listener für Stop-Button
@@ -28,18 +29,26 @@
           clearInterval(sensorInterval); // Sensorausleseintervall beenden
           window.removeEventListener("deviceorientation", handleOrientation, true);
           window.removeEventListener("devicemotion", handleMotion, true);
+
+          console.log(sensorData);
       });
 
       function readSensors() {
         // Funktion zum Auslesen der Sensoren
-        window.addEventListener("deviceorientation", handleOrientation, true);
-        window.addEventListener("devicemotion", handleMotion, true);
+        var time = Date.now(); // Aktuellen Zeitstempel ermitteln
+        window.addEventListener("deviceorientation", function(event) {
+          handleOrientation(event, time);
+        }, true);
+        window.addEventListener("devicemotion", function(event) {
+          handleMotion(event, time);
+        }, true);
       }
 
       function handleOrientation(event) {
       var alpha = event.alpha; // Z-Achse (Yaw)
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
+      sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
       $("#gamma").html(gamma.toFixed(2)+"°");
@@ -51,6 +60,7 @@
       var x = acceleration.x; // Beschleunigung in x-Richtung
       var y = acceleration.y; // Beschleunigung in y-Richtung
       var z = acceleration.z; // Beschleunigung in z-Richtung
+      sensorData.push({ x: x, y: y, z: z});
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
       $("#acc_z").html(z.toFixed(2)+"m/s²");
