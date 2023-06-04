@@ -25,13 +25,12 @@
 
       // Event Listener für Stop-Button
       $("#stopButton").click(function() {
-          console.log("stop listening...");
-          isReadingSensors = false;
-          clearInterval(sensorInterval); // Sensorausleseintervall beenden
-          window.removeEventListener("deviceorientation", handleOrientation, true);
-          window.removeEventListener("devicemotion", handleMotion, true);
-
-          console.log("save data..");
+        console.log("Stop listening...");
+        isReadingSensors = false;
+        clearInterval(sensorInterval); // Sensorausleseintervall beenden
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+        if (sensorData.length > 0) {
           var sensorDataStr = sensorData.map(function(data) {
             return data.join(", ");
           }).join("\n");
@@ -41,9 +40,7 @@
           link.href = url;
           link.download = "sensor_data.txt";
           link.click();
-          sensorData = [];
-          console.log("saved");
-        
+        }
       });
 
       function handleOrientation(event) {
