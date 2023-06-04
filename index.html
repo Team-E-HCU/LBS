@@ -6,29 +6,40 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     .sensor-value {
-      font-size: 16px; /* Schriftgröße für die Sensormesswerte */
-      color: red;
+      font-size: 12px; /* Schriftgröße für die Sensormesswerte */
     }
   </style>
   <script>
     $(document).ready(function() {
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
+      var sensorData = []; // Array zur Speicherung der Sensordaten
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
-          console.log("start listening...");
-          isReadingSensors = true;
-          sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
+        console.log("Start listening...");
+        isReadingSensors = true;
+        sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
       });
 
       // Event Listener für Stop-Button
       $("#stopButton").click(function() {
-          console.log("stop listening...");
-          isReadingSensors = false;
-          clearInterval(sensorInterval); // Sensorausleseintervall beenden
-          window.removeEventListener("deviceorientation", handleOrientation, true);
-          window.removeEventListener("devicemotion", handleMotion, true);
+        console.log("Stop listening...");
+        isReadingSensors = false;
+        clearInterval(sensorInterval); // Sensorausleseintervall beenden
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+        if (sensorData.length > 0) {
+          var sensorDataStr = sensorData.map(function(data) {
+            return Object.values(data).join(", ");
+          }).join("\n");
+          var blob = new Blob([sensorDataStr], { type: "text/plain" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "sensor_data.txt";
+          link.click();
+        }
       });
 
       function readSensors() {
@@ -38,33 +49,35 @@
       }
 
       function handleOrientation(event) {
-      var alpha = event.alpha; // Z-Achse (Yaw)
-      var beta = event.beta; // X-Achse (Pitch)
-      var gamma = event.gamma; // Y-Achse (Roll)
-      $("#alpha").html(alpha.toFixed(2)+"°");
-      $("#beta").html(beta.toFixed(2)+"°");
-      $("#gamma").html(gamma.toFixed(2)+"°");
-      $("#time").html(Date.now()+"ms");
+        var alpha = event.alpha; // Z-Achse (Yaw)
+        var beta = event.beta; // X-Achse (Pitch)
+        var gamma = event.gamma; // Y-Achse (Roll)
+        var time = Date.now(); // Zeitstempel
+        sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
+        $("#alpha").html(alpha.toFixed(2));
+        $("#beta").html(beta.toFixed(2));
+        $("#gamma").html(gamma.toFixed(2));
+        $("#time").html(time + "ms");
       }
 
       function handleMotion(event) {
-      var acceleration = event.acceleration; // Beschleunigungsvektor
-      var x = acceleration.x; // Beschleunigung in x-Richtung
-      var y = acceleration.y; // Beschleunigung in y-Richtung
-      var z = acceleration.z; // Beschleunigung in z-Richtung
-      $("#acc_x").html(x.toFixed(2)+"m/s²");
-      $("#acc_y").html(y.toFixed(2)+"m/s²");
-      $("#acc_z").html(z.toFixed(2)+"m/s²");
+        var acceleration = event.acceleration; // Beschleunigungsvektor
+        var x = acceleration.x; // Beschleunigung in x-Richtung
+        var y = acceleration.y; // Beschleunigung in y-Richtung
+        var z = acceleration.z; // Beschleunigung in z-Richtung
+        $("#acc_x").html(x.toFixed(2) + "m/s²");
+        $("#acc_y").html(y.toFixed(2) + "m/s²");
+        $("#acc_z").html(z.toFixed(2) + "m/s²");
       }
     });
 
-  // Request permission for iOS 13+ devices
-  if (
-    DeviceMotionEvent &&
-    typeof DeviceMotionEvent.requestPermission === "function"
-  ) {
-    DeviceMotionEvent.requestPermission();
-  };
+    // Request permission for iOS 13+ devices
+    if (
+      DeviceMotionEvent &&
+      typeof DeviceMotionEvent.requestPermission === "function"
+    ) {
+      DeviceMotionEvent.requestPermission();
+    };
   </script>
 </head>
 <body>
@@ -85,8 +98,6 @@
   <p>X-Achse: <span id="acc_x" class="sensor-value"></span></p>
   <p>Y-Achse: <span id="acc_y" class="sensor-value"></span></p>
   <p>Z-Achse: <span id="acc_z" class="sensor-value"></span></p>
-
-
 
 </body>
 </html>
