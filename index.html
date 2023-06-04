@@ -37,7 +37,7 @@
         var url_acc = URL.createObjectURL(blob_acc);
         var link_acc = document.createElement("a");
         link_acc.href = url_acc;
-        link_acc.download = "accData.txt";
+        link_acc.download = "sensorData.txt";
         link_acc.click();
 
         /*
@@ -57,7 +57,7 @@
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
       //sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
-      orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma;
+      orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma + "\n";
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
       $("#gamma").html(gamma.toFixed(2)+"°");
@@ -70,7 +70,7 @@
       var y = acceleration.y; // Beschleunigung in y-Richtung
       var z = acceleration.z; // Beschleunigung in z-Richtung
       //sensorData.push({ x: x, y: y, z: z});
-      accData += Date.now() + "," + x + "," + y + "," + z;
+      accData += Date.now() + "," + x + "," + y + "," + z + "\n";
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
       $("#acc_z").html(z.toFixed(2)+"m/s²");
