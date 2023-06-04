@@ -16,6 +16,31 @@
       var sensorData = []; // Array zur Speicherung der Sensordaten
       var currentEntry = []; // Array für den aktuellen Eintrag
 
+      // Event Listener für Start-Button
+      $("#startButton").click(function() {
+        console.log("Start listening...");
+        isReadingSensors = true;
+        sensorInterval = setInterval(readSensors, 10); // Sensoren alle 10 ms auslesen
+      });
+
+      // Event Listener für Stop-Button
+      $("#stopButton").click(function() {
+        console.log("Stop listening...");
+        isReadingSensors = false;
+        clearInterval(sensorInterval); // Sensorausleseintervall beenden
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+        if (sensorData.length > 0) {
+          var sensorDataStr = sensorData.join("\n");
+          var blob = new Blob([sensorDataStr], { type: "text/plain" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "sensor_data.txt";
+          link.click();
+        }
+      });
+
       function readSensors() {
         // Funktion zum Auslesen der Sensoren
         var time = Date.now(); // Aktuellen Zeitstempel ermitteln
@@ -31,7 +56,7 @@
         var alpha = event.alpha; // Z-Achse (Yaw)
         var beta = event.beta; // X-Achse (Pitch)
         var gamma = event.gamma; // Y-Achse (Roll)
-        currentEntry.push(alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2));
+        currentEntry.push(time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2));
         $("#alpha").html(alpha.toFixed(2));
         $("#beta").html(beta.toFixed(2));
         $("#gamma").html(gamma.toFixed(2));
