@@ -32,8 +32,13 @@
       $("#stopButton").click(function() {
         console.log("Stop listening...");
 
-        window.removeEventListener("deviceorientation", handleOrientation, true);
-        window.removeEventListener("devicemotion", handleMotion, true);
+        window.removeEventListener("deviceorientation", function(event) {
+          handleOrientation(event, time);
+        });
+        window.removeEventListener("devicemotion", function(event) {
+          handleMotion(event, time);
+        });
+        
         if (sensorData.length > 0) {
           var sensorDataStr = sensorData.map(function(data) {
             return data.join(", ");
