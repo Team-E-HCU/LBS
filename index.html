@@ -31,7 +31,7 @@
           window.removeEventListener("deviceorientation", handleOrientation, true);
           window.removeEventListener("devicemotion", handleMotion, true);
 
-          if (sensorData.length > 0) {
+          console.log("save data..");
           var sensorDataStr = sensorData.map(function(data) {
             return data.join(", ");
           }).join("\n");
@@ -42,7 +42,8 @@
           link.download = "sensor_data.txt";
           link.click();
           sensorData = [];
-        }
+          console.log("saved");
+        
       });
 
       function handleOrientation(event) {
