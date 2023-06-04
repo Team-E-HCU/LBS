@@ -14,33 +14,7 @@
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
       var sensorInterval; // Variable für das Intervall der Sensorauslesung
       var sensorData = []; // Array zur Speicherung der Sensordaten
-
-      // Event Listener für Start-Button
-      $("#startButton").click(function() {
-        console.log("Start listening...");
-        isReadingSensors = true;
-        sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
-      });
-
-      // Event Listener für Stop-Button
-      $("#stopButton").click(function() {
-        console.log("Stop listening...");
-        isReadingSensors = false;
-        clearInterval(sensorInterval); // Sensorausleseintervall beenden
-        window.removeEventListener("deviceorientation", handleOrientation, true);
-        window.removeEventListener("devicemotion", handleMotion, true);
-        if (sensorData.length > 0) {
-          var sensorDataStr = sensorData.map(function(data) {
-            return data.join(", ");
-          }).join("\n");
-          var blob = new Blob([sensorDataStr], { type: "text/plain" });
-          var url = URL.createObjectURL(blob);
-          var link = document.createElement("a");
-          link.href = url;
-          link.download = "sensor_data.txt";
-          link.click();
-        }
-      });
+      var currentEntry = []; // Array für den aktuellen Eintrag
 
       function readSensors() {
         // Funktion zum Auslesen der Sensoren
@@ -57,8 +31,7 @@
         var alpha = event.alpha; // Z-Achse (Yaw)
         var beta = event.beta; // X-Achse (Pitch)
         var gamma = event.gamma; // Y-Achse (Roll)
-        var sensorEntry = [time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2)];
-        appendToSensorData(sensorEntry);
+        currentEntry.push(alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2));
         $("#alpha").html(alpha.toFixed(2));
         $("#beta").html(beta.toFixed(2));
         $("#gamma").html(gamma.toFixed(2));
@@ -70,20 +43,15 @@
         var x = acceleration.x; // Beschleunigung in x-Richtung
         var y = acceleration.y; // Beschleunigung in y-Richtung
         var z = acceleration.z; // Beschleunigung in z-Richtung
-        var sensorEntry = [time, x.toFixed(2), y.toFixed(2), z.toFixed(2)];
-        appendToSensorData(sensorEntry);
+        currentEntry.push(x.toFixed(2), y.toFixed(2), z.toFixed(2));
         $("#acc_x").html(x.toFixed(2));
         $("#acc_y").html(y.toFixed(2));
         $("#acc_z").html(z.toFixed(2));
       }
 
-      function appendToSensorData(entry) {
-        var lastEntry = sensorData.length > 0 ? sensorData[sensorData.length - 1] : null;
-        if (lastEntry && lastEntry.length < 7 && lastEntry[0] === entry[0]) {
-          lastEntry.push.apply(lastEntry, entry.slice(1));
-        } else {
-          sensorData.push(entry);
-        }
+      function appendToSensorData() {
+        sensorData.push(currentEntry.join(", "));
+        currentEntry = [];
       }
     });
 
