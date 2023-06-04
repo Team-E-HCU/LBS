@@ -6,7 +6,6 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
-      var updateInterval;
       window.addEventListener("deviceorientation", handleOrientation, true);
       window.addEventListener("devicemotion", handleMotion, true);
 
@@ -18,6 +17,7 @@
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
       $("#gamma").html(gamma.toFixed(2)+"°");
+      $("#time").html(Date.now()+"ms");
       }
 
       function handleMotion(event) {
