@@ -44,15 +44,19 @@
 
       function readSensors() {
         // Funktion zum Auslesen der Sensoren
-        window.addEventListener("deviceorientation", handleOrientation, true);
-        window.addEventListener("devicemotion", handleMotion, true);
+        var time = Date.now(); // Aktuellen Zeitstempel ermitteln
+        window.addEventListener("deviceorientation", function(event) {
+          handleOrientation(event, time);
+        }, true);
+        window.addEventListener("devicemotion", function(event) {
+          handleMotion(event, time);
+        }, true);
       }
 
-      function handleOrientation(event) {
+      function handleOrientation(event, time) {
         var alpha = event.alpha; // Z-Achse (Yaw)
         var beta = event.beta; // X-Achse (Pitch)
         var gamma = event.gamma; // Y-Achse (Roll)
-        var time = Date.now(); // Zeitstempel
         sensorData.push([time, alpha.toFixed(2), beta.toFixed(2), gamma.toFixed(2)]);
         $("#alpha").html(alpha.toFixed(2));
         $("#beta").html(beta.toFixed(2));
@@ -60,16 +64,15 @@
         $("#time").html(time + "ms");
       }
 
-      function handleMotion(event) {
+      function handleMotion(event, time) {
         var acceleration = event.acceleration; // Beschleunigungsvektor
         var x = acceleration.x; // Beschleunigung in x-Richtung
         var y = acceleration.y; // Beschleunigung in y-Richtung
         var z = acceleration.z; // Beschleunigung in z-Richtung
-        var time = Date.now(); // Zeitstempel
         sensorData.push([time, x.toFixed(2), y.toFixed(2), z.toFixed(2)]);
-        $("#acc_x").html(x.toFixed(2) + "m/s²");
-        $("#acc_y").html(y.toFixed(2) + "m/s²");
-        $("#acc_z").html(z.toFixed(2) + "m/s²");
+        $("#acc_x").html(x.toFixed(2));
+        $("#acc_y").html(y.toFixed(2));
+        $("#acc_z").html(z.toFixed(2));
       }
     });
 
