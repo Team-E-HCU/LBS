@@ -11,14 +11,18 @@
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
+          console.log("start listening...");
           isReadingSensors = true;
           sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
       });
 
       // Event Listener für Stop-Button
       $("#stopButton").click(function() {
+          console.log("stop listening...");
           isReadingSensors = false;
           clearInterval(sensorInterval); // Sensorausleseintervall beenden
+          window.removeEventListener("deviceorientation", handleOrientation, true);
+          window.removeEventListener("devicemotion", handleMotion, true);
       });
 
       function readSensors() {
@@ -60,6 +64,9 @@
 <body>
   <h1>Sensoren im Smartphone</h1>
 
+  <button id="startButton">Start</button>
+  <button id="stopButton">Stop</button>
+
   <h2>Zeit</h2>
   <p>Time: <span id="time"></span></p>
 
@@ -73,8 +80,7 @@
   <p>Y-Achse: <span id="acc_y"></span></p>
   <p>Z-Achse: <span id="acc_z"></span></p>
 
-  <button id="startButton">Start</button>
-  <button id="stopButton">Stop</button>
+
 
 </body>
 </html>
