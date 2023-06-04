@@ -51,7 +51,6 @@
         window.addEventListener("devicemotion", function(event) {
           handleMotion(event, time);
         }, true);
-        setTimeout(readSensors, 10); // Sensoren alle 10 ms auslesen
       }
 
       function handleOrientation(event, time) {
@@ -79,7 +78,12 @@
       }
 
       function appendToSensorData(entry) {
-        sensorData.push(entry);
+        var lastEntry = sensorData.length > 0 ? sensorData[sensorData.length - 1] : null;
+        if (lastEntry && lastEntry.length < 7 && lastEntry[0] === entry[0]) {
+          lastEntry.push.apply(lastEntry, entry.slice(1));
+        } else {
+          sensorData.push(entry);
+        }
       }
     });
 
