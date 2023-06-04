@@ -36,7 +36,7 @@
         output = "Acceleration Data: Time, x, y, z \n";
         output += accData + "\n" + "Orientation Data: Time, alpha, beta, gamma \n" + orientationData;
 
-        var blob_acc = new Blob([accData], { type: "text/plain" });
+        var blob_acc = new Blob([output], { type: "text/plain" });
         var url_acc = URL.createObjectURL(blob_acc);
         var link_acc = document.createElement("a");
         link_acc.href = url_acc;
