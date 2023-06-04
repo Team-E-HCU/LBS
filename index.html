@@ -11,18 +11,14 @@
 
       // Event Listener für Start-Button
       $("#startButton").click(function() {
-        if (!isReadingSensors) { // Überprüfen, ob die Sensoren bereits ausgelesen werden
           isReadingSensors = true;
           sensorInterval = setInterval(readSensors, 1); // Sensoren alle 1 ms auslesen
-        }
       });
 
       // Event Listener für Stop-Button
       $("#stopButton").click(function() {
-        if (isReadingSensors) { // Überprüfen, ob die Sensoren aktuell ausgelesen werden
           isReadingSensors = false;
-          sensorInterval = setInterval(readSensors, 0) // Sensorausleseintervall beenden
-        }
+          clearInterval(sensorInterval); // Sensorausleseintervall beenden
       });
 
       function readSensors() {
@@ -35,7 +31,6 @@
       var alpha = event.alpha; // Z-Achse (Yaw)
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
-      // console.log("alpha: " + alpha + ", beta: " + beta + ", gamma: " + gamma);
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
       $("#gamma").html(gamma.toFixed(2)+"°");
