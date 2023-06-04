@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>Sensoren auslesen</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .sensor-value {
+      font-size: 16px; /* Schriftgröße für die Sensormesswerte */
+    }
+  </style>
   <script>
     $(document).ready(function() {
       var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
@@ -68,17 +73,17 @@
   <button id="stopButton">Stop</button>
 
   <h2>Zeit</h2>
-  <p>Time: <span id="time"></span></p>
+  <p>Time: <span id="time" class="sensor-value"></span></p>
 
   <h2>Orientierung (Gyroskop)</h2>
-  <p>Alpha: <span id="alpha"></span></p>
-  <p>Beta: <span id="beta"></span></p>
-  <p>Gamma: <span id="gamma"></span></p>
+  <p>Alpha: <span id="alpha" class="sensor-value"></span></p>
+  <p>Beta: <span id="beta" class="sensor-value"></span></p>
+  <p>Gamma: <span id="gamma" class="sensor-value"></span></p>
 
   <h2>Beschleunigung (Beschleunigungssensor)</h2>
-  <p>X-Achse: <span id="acc_x"></span></p>
-  <p>Y-Achse: <span id="acc_y"></span></p>
-  <p>Z-Achse: <span id="acc_z"></span></p>
+  <p>X-Achse: <span id="acc_x" class="sensor-value"></span></p>
+  <p>Y-Achse: <span id="acc_y" class="sensor-value"></span></p>
+  <p>Z-Achse: <span id="acc_z" class="sensor-value"></span></p>
 
 
 
