@@ -21,7 +21,7 @@
       $("#stopButton").click(function() {
         if (isReadingSensors) { // Überprüfen, ob die Sensoren aktuell ausgelesen werden
           isReadingSensors = false;
-          clearInterval(sensorInterval); // Sensorausleseintervall beenden
+          sensorInterval = setInterval(readSensors, 0) // Sensorausleseintervall beenden
         }
       });
 
