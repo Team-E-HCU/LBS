@@ -33,8 +33,8 @@
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
 
-        output = "Acceleration Data: Time, x, y, z \n";
-        output += accData + "\n" + "Orientation Data: Time, alpha, beta, gamma \n" + orientationData;
+        output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
+        output += accData + "\n" + "Orientation Data \nTime [ms], alpha [°], beta [°], gamma [°] \n" + orientationData;
 
         var blob_acc = new Blob([output], { type: "text/plain" });
         var url_acc = URL.createObjectURL(blob_acc);
