@@ -11,8 +11,8 @@
   </style>
   <script>
     $(document).ready(function() {
-      var isReadingSensors = false; 
-      var sensorInterval; 
+      var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
+      var sensorInterval; // Variable für das Intervall der Sensorauslesung
       var accData = "";
       var orientationData = "";
       var output = "";
@@ -29,20 +29,28 @@
       $("#stopButton").click(function() {
         console.log("Stop listening...");
         isReadingSensors = false;
-        clearInterval(sensorInterval); 
+        clearInterval(sensorInterval); // Sensorausleseintervall beenden
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
 
         output = "Acceleration Data: Time, x, y, z \n";
         output += accData + "\n" + "Orientation Data: Time, alpha, beta, gamma \n" + orientationData;
 
-        var blob = new Blob([output], { type: "text/plain" });
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement("a");s
-        link.href = url;
-        link.download = "sensorData.txt";
-        link.click();
+        var blob_acc = new Blob([output], { type: "text/plain" });
+        var url_acc = URL.createObjectURL(blob_acc);
+        var link_acc = document.createElement("a");
+        link_acc.href = url_acc;
+        link_acc.download = "sensorData.txt";
+        link_acc.click();
 
+        /*
+        var blob_or = new Blob([orientationData], { type: "text/plain" });
+        var url_or = URL.createObjectURL(blob_or);
+        var link_or = document.createElement("a");
+        link_or.href = url_or;
+        link_or.download = "orientationData.txt";
+        link_or.click();
+        */
         accData = "";
         orientationData = "";
       });
@@ -51,7 +59,7 @@
       var alpha = event.alpha; // Z-Achse (Yaw)
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
-      
+      //sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
       orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma + "\n";
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
@@ -64,7 +72,7 @@
       var x = acceleration.x; // Beschleunigung in x-Richtung
       var y = acceleration.y; // Beschleunigung in y-Richtung
       var z = acceleration.z; // Beschleunigung in z-Richtung
-      
+      //sensorData.push({ x: x, y: y, z: z});
       accData += Date.now() + "," + x + "," + y + "," + z + "\n";
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
