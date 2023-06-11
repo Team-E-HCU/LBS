@@ -48,10 +48,10 @@
       });
 
       // Funktion Handle Orientierungsänderung
-      function handleOrientation(event) {
-      var alpha = event.alpha; // Z-Achse (Yaw)
-      var beta = event.beta; // X-Achse (Pitch)
-      var gamma = event.gamma; // Y-Achse (Roll)
+      function handleOrientation(event_or) {
+      var alpha = event_or.alpha; // Z-Achse (Yaw)
+      var beta = event_or.beta; // X-Achse (Pitch)
+      var gamma = event_or.gamma; // Y-Achse (Roll)
       orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma + "\n";
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
@@ -61,9 +61,9 @@
 
       // Funktion Handle Beschleunigungsänderung
       function handleMotion(event) {
-      var x = event.x; // Beschleunigung in x-Richtung
-      var y = event.y; // Beschleunigung in y-Richtung
-      var z = event.z; // Beschleunigung in z-Richtung
+      var x = event_acc.x; // Beschleunigung in x-Richtung
+      var y = event_acc.y; // Beschleunigung in y-Richtung
+      var z = event_acc.z; // Beschleunigung in z-Richtung
       accData += Date.now() + "," + x + "," + y + "," + z + "\n";
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
@@ -74,7 +74,7 @@
 
 </head>
 <body>
-  <h1>Sensoren im Smartphone V1.1</h1>
+  <h1>Sensoren im Smartphone V1.2</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
