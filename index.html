@@ -61,9 +61,9 @@
 
       // Funktion Handle Beschleunigungsänderung
       function handleMotion(event_acc) {
-      var x = event_acc.x; // Beschleunigung in x-Richtung
-      var y = event_acc.y; // Beschleunigung in y-Richtung
-      var z = event_acc.z; // Beschleunigung in z-Richtung
+      var x = event_acc.acceleration.x; // Beschleunigung in x-Richtung
+      var y = event_acc.acceleration.y; // Beschleunigung in y-Richtung
+      var z = event_acc.acceleration.z; // Beschleunigung in z-Richtung
       accData += Date.now() + "," + x + "," + y + "," + z + "\n";
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
