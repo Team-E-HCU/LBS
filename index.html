@@ -2,37 +2,37 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Sensoren auslesen</title>
+  <title>Smartphonesensoren auslesen</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <style>
     .sensor-value {
       font-size: 12px; /* Schriftgröße für die Sensormesswerte */
     }
   </style>
+
   <script>
     $(document).ready(function() {
-      var isReadingSensors = false; // Variable zur Verfolgung des Sensorstatus
-      var sensorInterval; // Variable für das Intervall der Sensorauslesung
       var accData = "";
       var orientationData = "";
       var output = "";
 
-      // Event Listener für Start-Button
+      // Funktion für Start-Button
       $("#startButton").click(function() {
+          // Daten auslesen starten
           console.log("start listening...");
-          isReadingSensors = true;
           window.addEventListener("deviceorientation", handleOrientation, true);
           window.addEventListener("devicemotion", handleMotion, true);
       });
 
-      // Event Listener für Stop-Button
+      // Funktion für Stop-Button
       $("#stopButton").click(function() {
+        // Daten auslesen beenden
         console.log("Stop listening...");
-        isReadingSensors = false;
-        clearInterval(sensorInterval); // Sensorausleseintervall beenden
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
 
+        // Gesammelte Daten in txt-Datei schreiben und zum Herunterladen anbieten
         output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
         output += accData + "\n" + "Orientation Data \nTime [ms], alpha [°], beta [°], gamma [°] \n" + orientationData;
 
@@ -47,11 +47,11 @@
         orientationData = "";
       });
 
+      // Funktion Handle Orientierungsänderung
       function handleOrientation(event) {
       var alpha = event.alpha; // Z-Achse (Yaw)
       var beta = event.beta; // X-Achse (Pitch)
       var gamma = event.gamma; // Y-Achse (Roll)
-      //sensorData.push({ alpha: alpha, beta: beta, gamma: gamma, time: time });
       orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma + "\n";
       $("#alpha").html(alpha.toFixed(2)+"°");
       $("#beta").html(beta.toFixed(2)+"°");
@@ -59,30 +59,22 @@
       $("#time").html(Date.now()+"ms");
       }
 
+      // Funktion Handle Beschleunigungsänderung
       function handleMotion(event) {
-      var acceleration = event.acceleration; // Beschleunigungsvektor
       var x = acceleration.x; // Beschleunigung in x-Richtung
       var y = acceleration.y; // Beschleunigung in y-Richtung
       var z = acceleration.z; // Beschleunigung in z-Richtung
-      //sensorData.push({ x: x, y: y, z: z});
       accData += Date.now() + "," + x + "," + y + "," + z + "\n";
       $("#acc_x").html(x.toFixed(2)+"m/s²");
       $("#acc_y").html(y.toFixed(2)+"m/s²");
       $("#acc_z").html(z.toFixed(2)+"m/s²");
       }
     });
-
-  // Request permission for iOS 13+ devices
-  if (
-    DeviceMotionEvent &&
-    typeof DeviceMotionEvent.requestPermission === "function"
-  ) {
-    DeviceMotionEvent.requestPermission();
-  };
   </script>
+
 </head>
 <body>
-  <h1>Sensoren im Smartphone</h1>
+  <h1>Sensoren im Smartphone V1.1</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
@@ -99,8 +91,6 @@
   <p>X-Achse: <span id="acc_x" class="sensor-value"></span></p>
   <p>Y-Achse: <span id="acc_y" class="sensor-value"></span></p>
   <p>Z-Achse: <span id="acc_z" class="sensor-value"></span></p>
-
-
 
 </body>
 </html>
