@@ -33,31 +33,24 @@
         window.removeEventListener("devicemotion", handleMotion, true);
 
         // Gesammelte Daten in txt-Datei schreiben und zum Herunterladen anbieten
-        // ACC
-        output_acc = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
-        output_acc += accData;
+          /* Beide Datensätze müssen in eine TXT Datei geschrieben werden, da das Smartphone nur eine Datei herunterladen kann */
+          /* Als Trennzeichen zwischen Beschleunigungs und Orientierungsdaten für die Weiterverarbeitung wird BREAK genutzt */
+          output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
+          output += accData;
+          output += "BREAK\n"
+          output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
+          output += orientationData;
 
-        var blob_acc = new Blob([output_acc], { type: "text/plain" });
-        var url_acc = URL.createObjectURL(blob_acc);
-        var link_acc = document.createElement("a");
-        link_acc.href = url_acc;
-        link_acc.download = "accelerationData.txt";
-        link_acc.click();
+          var blob = new Blob([output], { type: "text/plain" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "sensorData.txt";
+          link.click();
 
-        // OR
-        output_or = "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
-        output_or += orientationData;
-
-        var blob_or = new Blob([output_or], { type: "text/plain" });
-        var url_or = URL.createObjectURL(blob_or);
-        var link_or = document.createElement("a");
-        link_or.href = url_or;
-        link_or.download = "orientationData.txt";
-        link_or.click();
-
-        // Datenvariablen bereinigen
-        accData = "";
-        orientationData = "";
+          // Datenvariablen bereinigen
+          accData = "";
+          orientationData = "";
       });
 
       // Funktion Handle Orientierungsänderung
@@ -87,7 +80,7 @@
 
 </head>
 <body>
-  <h1>Sensoren im Smartphone V1.3.1</h1>
+  <h1>Sensoren im Smartphone V1.3.2</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
