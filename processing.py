@@ -417,8 +417,8 @@ for filename in filelist:
     
     
     # Filterung, Glättung und Visualisierung der 2D Trajektorie
-    dataset,mx,my = filter_trajektorie_2D(trajectorie_xy, limit=50)
-    dataset = smooth_trajektorie_2D(dataset,1)
+    dataset,mx,my = filter_trajektorie_2D(trajectorie_xy, limit=3)
+    dataset = smooth_trajektorie_2D(dataset,3)
     plot_trajektorie_xy(dataset, mx, my)
     
     # Visualisierung der Trajektorie in 3D
