@@ -10,11 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as m
 
-filename = "sensorData_KreisXYGross.txt"
-filelist = ["data_new/SensorData.txt"] + [f"data_new/SensorData ({i}).txt" for i in range(1,20)]
-# data_new/SensorData bis SensorData (9) --> Kreise
-# data_new/SensorData (10) bis SensorData (19) --> Kreuze
 
+filelist_kreise = [f"data_new/Kreise/SensorData ({i}).txt" for i in range(0,10)]
+filelist_kreuze = [f"data_new/Kreuze/SensorData ({i}).txt" for i in range(10,20)]
 
 #%%
 """
@@ -296,6 +294,7 @@ def diff_kreis_XY(trajektorie, kreis, mx, my):
         diff_mean = np.mean(diff)
     return(diff_mean)
 
+
 """ Funktionen zum Plotten von Ergebnissen """
 
 def plot_beschleunigung(acc_time, acc_x, acc_y, acc_z, fname="Beschleunigung.png"):
@@ -344,7 +343,7 @@ def plot_trajektorie_xy(dataset, mx, my, fname="XY-Trajektorie.png"):
     plt.savefig(fname)
     plt.show()
     
-def plot_trajektorie_xyz(dataset, fname="XYZ-Trajektorie.png"):
+def plot_trajektorie_xyz(trajectorie_xyz, fname="XYZ-Trajektorie.png"):
     # Plot der 3D Trajektorie
     fig = plt.plot()
     ax = plt.axes(projection='3d')
@@ -360,7 +359,7 @@ def plot_trajektorie_xyz(dataset, fname="XYZ-Trajektorie.png"):
     ax.plot3D(xdata, ydata, zdata)
     ax.view_init(45, 60)
     
-def plot_kreis_XY(dataset, kreis, fname="XY_Kreis_fitted.png"):
+def plot_kreis_XY(dataset, kreis, mx, my, fname="XY_Kreis_fitted.png"):
     ax = plt.axes()
     fig_kreis = plt.plot(dataset["x"], dataset["y"], '.',label="Positionen")
     fig_kreis = plt.plot(mx, my, '.', label="Mittelpunkt", color="red")
@@ -377,8 +376,7 @@ def plot_kreis_XY(dataset, kreis, fname="XY_Kreis_fitted.png"):
 ##### Hauptprogramm #####
 """
 
-for filename in filelist:
-
+def processing(filename):
     # Aufbereitung der Daten
     accData, orData = data_preparation(filename)
     acc_time, acc_x, acc_y, acc_z, o_time, o_alpha, o_beta, o_gamma = synchronisierung(accData, orData)
@@ -419,15 +417,34 @@ for filename in filelist:
     # Filterung, Glättung und Visualisierung der 2D Trajektorie
     dataset,mx,my = filter_trajektorie_2D(trajectorie_xy, limit=3)
     dataset = smooth_trajektorie_2D(dataset,3)
-    plot_trajektorie_xy(dataset, mx, my)
+        #plot_trajektorie_xy(dataset, mx, my)
     
     # Visualisierung der Trajektorie in 3D
-    plot_trajektorie_xyz(dataset)
+        #plot_trajektorie_xyz(trajectorie_xyz)
     
-    # Berechnung eines Kreises in die XY-Trajektorie
+    # Berechnung und Visualisierung eines Kreises in die XY-Trajektorie
     kreis, mx, my = berechne_kreis_XY(dataset)
-    plot_kreis_XY(dataset, kreis)
+    plot_kreis_XY(dataset, kreis, mx, my)
     
     # Berechnung der Standardabweichung zum Kreis
     mittlere_abweichung = diff_kreis_XY(trajectorie_xy, kreis, mx, my)
-    print(f"{filename}, Abweichung: {np.round(mittlere_abweichung*100,3)}")
+    print(f"{filename}, Abweichung: {np.round(mittlere_abweichung,3)}")
+    return(mittlere_abweichung)
+
+#%% 
+"""
+##### Abruf des Hauptprogramms für alle Dateien #####
+"""
+d_kreise = []
+d_kreuze = []
+    
+print("Berechnung der mittleren Abweichung vom Kreis für Kreise: ")
+for filename in filelist_kreise:
+    d_kreise.append(processing(filename))
+    
+print("\nBerechnung der mittleren Abweichung vom Kreis für Kreuze: ")
+for filename in filelist_kreuze:
+    d_kreuze.append(processing(filename))
+    
+print(f"\nMittlere Abweichungen:\nKreise: {np.mean(d_kreise)}\nKreuze: {np.mean(d_kreuze)}")
+    
