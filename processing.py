@@ -4,7 +4,8 @@ Verarbeitung der ausgelesenen Sensordaten aus:
     
 Input: Textdatei mit Gyroskop- und Sensordaten (unverändert)
 
-To-Do: Funktionsbeschreibungen vervollständigen
+Anmerkung:
+Die Funktionen diff_kreis und berechne_kreis sind redundant, eine dient aber mehr der visualisierung und die andere mehr der berechnung
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,6 +14,8 @@ import math as m
 
 filelist_kreise = [f"data_new/Kreise/SensorData ({i}).txt" for i in range(0,10)]
 filelist_kreuze = [f"data_new/Kreuze/SensorData ({i}).txt" for i in range(10,20)]
+
+create_plots = True # True/False --> Sollen plots gemacht werden? (Programmlaufzeit +)
 
 #%%
 """
@@ -24,16 +27,16 @@ filelist_kreuze = [f"data_new/Kreuze/SensorData ({i}).txt" for i in range(10,20)
 # Textdatei einlesen und splitten in 2 Variablen für Beschleunigungs und Orientierungsdaten
 def data_preparation(filename):
     """
+    Hiermit wird die .txt Datei, welcher mit Hilfe unser GitHub Page erstellt wurde eingelesen und verarbeitet.
     
-
     Parameters
     ----------
-    filename : TYPE
-        DESCRIPTION.
+    filename : dateiname
 
     Returns
     -------
-    None.
+    accData (Daten des Beschleunigungssensors)
+    orData (Daten des Orientierungssensors)
 
     """
     with open(filename) as data:
@@ -72,6 +75,15 @@ def synchronisierung(accData, orData):
     """
     Gyroskop- und Beschleunigungswerte haben nicht exakt identische Zeitstempel
     Daher folgt die Synchronisierung über Interpolation
+    
+    Parameters
+    ----------
+    accData (Daten des Beschleunigungssensors)
+    orData (Daten des Orientierungssensors)
+
+    Returns
+    -------
+    Beschleunigungs- und Orientierungssensordaten als einzelnes Array für jede achse mit identischen Zeitstempeln
     """
     
     # Interpolation der Werte aus accData für jeden Zeitstempel orData
@@ -151,7 +163,7 @@ def calc_trajectory2D(position_data, rotation_data):
     last_value = {"x": 0.0, "y": 0.0, "z": 0.0}
     position_change = {"x": [], "y": [], "z": []}
     for xyz in ["x", "y", "z"]:
-        for i, e in enumerate(position_data[xyz]):
+        for i, e in enumerate(position_data[xyz]*100):
             position_change[xyz].append(e-last_value[xyz])
             last_value[xyz] = e
     trajectory = {"x": [0.0], "y": [0.0]}
@@ -163,7 +175,7 @@ def calc_trajectory2D(position_data, rotation_data):
 
 def calc_trajectory3D(position_data, rotation_data):
     """
-    This function calculates a 2D trajectory of an IMU using
+    This function calculates a 3D trajectory of an IMU using
     distance and rotation values. [Integrated Navigation EX2]
 
     Input:
@@ -173,7 +185,7 @@ def calc_trajectory3D(position_data, rotation_data):
     last_value = {"x": 0.0, "y": 0.0, "z": 0.0}
     position_change = {"x": [], "y": [], "z": []}
     for xyz in ["x", "y", "z"]:
-        for i, e in enumerate(position_data[xyz]):
+        for i, e in enumerate(position_data[xyz]*100):
             position_change[xyz].append(e-last_value[xyz])
             last_value[xyz] = e
     trajectory = {"x": [0.0], "y": [0.0], "z":[0.0]}
@@ -185,17 +197,18 @@ def calc_trajectory3D(position_data, rotation_data):
     return(trajectory)
 
 def filter_trajektorie_2D(dataset, limit=2):
-    """Berechnung der Geschwindigkeitswerte aus Beschleunigung und Zeit
+    """Mit dieser Funktion werden die Daten in XY Ebene nach Ausreißern gefiltert.
+    Kriterium ist der Abstand zum Mittelpunkt des Datensatzes
 
     Parameters
     ----------
-    acc : Beschleunigung [m/s²]
-    time : Zeitdifferenzen [s]
+    dataset: Dictionary mit x und y
+    limit: limit * mittlerer Abstand als Grenzwert für Filterung
 
     Returns
     -------
-    speed: Geschwindigkeit [m/2]
-
+    filtered_dataset: Gefilterter Datensatz
+    mean_x, mean_y: Zentrum des Datensatzes
     """
     # Mittelpunkt des Datensatzes berechnen
     mean_x, mean_y = np.mean(dataset["x"]), np.mean(dataset["y"])
@@ -217,17 +230,16 @@ def filter_trajektorie_2D(dataset, limit=2):
     return(filter_dataset,mean_x,mean_y)
 
 def smooth_trajektorie_2D(dataset, neighbours=3):
-    """Berechnung der Geschwindigkeitswerte aus Beschleunigung und Zeit
+    """Glättung der Trajektorie durch gleitendes Mittel unter Einbezug einer gegeben Anzahl von Nachbarpunkten
 
     Parameters
     ----------
-    acc : Beschleunigung [m/s²]
-    time : Zeitdifferenzen [s]
+    dataset : Zu glättende Trajektorie
+    neighbours : Einzubeziehende Nachbarpunkte
 
     Returns
     -------
-    speed: Geschwindigkeit [m/2]
-
+    smooth_dataset: Geglättete Trajektorie
     """
     smooth_dataset = {"x":[], "y":[]}
     for i in range(0+neighbours,len(dataset["x"])-neighbours,1):
@@ -236,17 +248,17 @@ def smooth_trajektorie_2D(dataset, neighbours=3):
     return(smooth_dataset)
 
 def berechne_kreis_XY(dataset):
-    """Berechnung der Geschwindigkeitswerte aus Beschleunigung und Zeit
+    """Diese Funktion berechnet den Mittelpunkt einer gefilterten und geglätteten Trajektorie und berechnet einen Kreis
+    aus mit mittlerem Abstand zu allen Punkten als Radius
 
     Parameters
     ----------
-    acc : Beschleunigung [m/s²]
-    time : Zeitdifferenzen [s]
+    dataset: Trajektorie, in die ein Kreis gelegt werden soll
 
     Returns
     -------
-    speed: Geschwindigkeit [m/2]
-
+    kreis: Punktdatensatz des Kreises
+    speedmean_x, mean_y: Kreismittelpunkt
     """
     
     # Mittelpunkt des Datensatzes berechnen
@@ -268,22 +280,17 @@ def berechne_kreis_XY(dataset):
         
 def diff_kreis_XY(trajektorie, kreis, mx, my):
     """
+    Diese Funktion berechnet den mittleren Abstand aller Punkte einer Trajektorie zu einem Kreis
     
-
-    Parameters
+    GGf. hier auf andere Methode umstellen --> evtl. Stabw? oder Varianz?
     ----------
-    trajektorie : TYPE
-        DESCRIPTION.
-    kreis : TYPE
-        DESCRIPTION.
-    mx : TYPE
-        DESCRIPTION.
-    my : TYPE
-        DESCRIPTION.
+    trajektorie: Datensatz 
+    kreis: Kreispunkte
+    mx, my: Kreismittelpunkt
 
     Returns
     -------
-    None.
+    diff_mean: Mittlere, absolute Abweichung
 
     """
     radius = np.sqrt( (kreis["x"][0]-mx)**2+(kreis["y"][0]-my)**2 ) 
@@ -297,93 +304,86 @@ def diff_kreis_XY(trajektorie, kreis, mx, my):
 
 """ Funktionen zum Plotten von Ergebnissen """
 
-def plot_beschleunigung(acc_time, acc_x, acc_y, acc_z, fname="Beschleunigung.png"):
-    # Plot Beschleunigungsmesswerte
-    fig = plt.plot(acc_time, acc_x, label="x-Achse")
-    fig = plt.plot(acc_time, acc_y, label="y-Achse")
-    fig = plt.plot(acc_time, acc_z, label="z-Achse")
-    plt.xlabel("Zeit [ms]")
-    plt.ylabel("Beschleunigung [m/s²]")
-    plt.legend()
-    plt.title("Beschleunigung")
-    plt.savefig(fname)
-    plt.show()
+def plot_beschleunigung(acc_time, acc_x, acc_y, acc_z, fname):
+    if create_plots == True:
+        # Plot Beschleunigungsmesswerte
+        fig = plt.plot(acc_time, acc_x, label="x-Achse")
+        fig = plt.plot(acc_time, acc_y, label="y-Achse")
+        fig = plt.plot(acc_time, acc_z, label="z-Achse")
+        plt.xlabel("Zeit [ms]")
+        plt.ylabel("Beschleunigung [m/s²]")
+        plt.legend()
+        plt.title("Beschleunigung")
+        plt.savefig(f"plots/{fname}_Beschleunigung.png")
+        plt.show()
     
-def plot_orientierung(o_time, o_alpha, o_beta, o_gamma, fname="Orientierung.png"):
-    # Plot Orientierung
-    fig = plt.plot(o_time, o_alpha, label="Alpha")
-    fig = plt.plot(o_time, o_beta, label="Beta")
-    fig = plt.plot(o_time, o_gamma, label="Gamma")
-    plt.xlabel("Zeit [ms]")
-    plt.ylabel("Orientierung [°]")
-    plt.legend()
-    plt.title("Orientierung")
-    plt.savefig(fname)
-    plt.show()
+def plot_orientierung(o_time, o_alpha, o_beta, o_gamma, fname):
+    if create_plots == True:
+        # Plot Orientierung
+        fig = plt.plot(o_time, o_alpha, label="Alpha")
+        fig = plt.plot(o_time, o_beta, label="Beta")
+        fig = plt.plot(o_time, o_gamma, label="Gamma")
+        plt.xlabel("Zeit [ms]")
+        plt.ylabel("Orientierung [°]")
+        plt.legend()
+        plt.title("Orientierung")
+        plt.savefig(f"plots/{fname}_Orientierung.png")
+        plt.show()
     
-def plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z, fname="Geschwindigkeit.png"):
-    # Plot der Geschwindigkeit für jede Achse
-    fig = plt.plot(np.cumsum(delta_t_acc), acc_v_x, label="X-Achse")
-    fig = plt.plot(np.cumsum(delta_t_acc), acc_v_y, label="Y-Achse")
-    fig = plt.plot(np.cumsum(delta_t_acc), acc_v_z, label="Z-Achse")
-    plt.xlabel("Zeit [s]")
-    plt.ylabel("Geschwindigkeit [m/s]")
-    plt.legend()
-    plt.title("Geschwindigkeit")
-    plt.savefig(fname)
-    plt.show()
-    
+def plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z, fname):
+    if create_plots == True:
+        # Plot der Geschwindigkeit für jede Achse
+        fig = plt.plot(np.cumsum(delta_t_acc), acc_v_x, label="X-Achse")
+        fig = plt.plot(np.cumsum(delta_t_acc), acc_v_y, label="Y-Achse")
+        fig = plt.plot(np.cumsum(delta_t_acc), acc_v_z, label="Z-Achse")
+        plt.xlabel("Zeit [s]")
+        plt.ylabel("Geschwindigkeit [m/s]")
+        plt.legend()
+        plt.title("Geschwindigkeit")
+        plt.savefig(f"plots/{fname}_Geschwindigkeit.png")
+        plt.show()
+        
 def plot_trajektorie_xy(dataset, mx, my, fname="XY-Trajektorie.png"):
-    fig = plt.plot(dataset["x"], dataset["y"], '.',label="Positionen")
-    fig = plt.plot(mx, my, '.', label="Mittelpunkt", color="red")
-    #plt.axis('scaled')
-    plt.xlabel("X [m]")
-    plt.ylabel("Y [m]")
-    plt.title("XY-Trajektorie")
-    plt.savefig(fname)
-    plt.show()
+    if create_plots == True:
+        fig = plt.plot(dataset["x"], dataset["y"], '.',label="Positionen")
+        fig = plt.plot(mx, my, '.', label="Mittelpunkt", color="red")
+        #plt.axis('scaled')
+        plt.xlabel("X [m]")
+        plt.ylabel("Y [m]")
+        plt.title("XY-Trajektorie")
+        plt.savefig(fname)
+        plt.show()
     
-def plot_trajektorie_xyz(trajectorie_xyz, fname="XYZ-Trajektorie.png"):
-    """
+def plot_trajektorie_xyz(trajectorie_xyz, fname):
+    if create_plots == True:
+        fig = plt.plot()
+        ax = plt.axes(projection='3d')
+        # Data for three-dimensional scattered points
+        zdata = trajectorie_xyz["z"]
+        xdata = trajectorie_xyz["x"]
+        ydata = trajectorie_xyz["y"]
+        #plt.xlabel("X [m]")
+        #plt.ylabel("Y [m]")
+        #plt.zlabel("Z [m]")
+        plt.title("XYZ-Trajektorie")
+        ax.scatter3D(xdata, ydata, zdata, c = zdata)
+        #ax.plot3D(xdata, ydata, zdata)
+        ax.view_init(20, 45)
+        plt.show()
+        plt.savefig(f"plots/{fname}_XYZ_Trajektorie.png")
     
-
-    Muss noch ausgebessert werden.
-    ----------
-    trajectorie_xyz : TYPE
-        DESCRIPTION.
-    fname : TYPE, optional
-        DESCRIPTION. The default is "XYZ-Trajektorie.png".
-
-    Returns
-    -------
-    None.
-
-    """
-    fig = plt.plot()
-    ax = plt.axes(projection='3d')
-    # Data for three-dimensional scattered points
-    zdata = trajectorie_xyz["z"]
-    xdata = trajectorie_xyz["x"]
-    ydata = trajectorie_xyz["y"]
-    #plt.xlabel("X [m]")
-    #plt.ylabel("Y [m]")
-    #plt.zlabel("Z [m]")
-    plt.title("XYZ-Trajektorie")
-    #ax.scatter3D(xdata, ydata, zdata, c = zdata)
-    ax.plot3D(xdata, ydata, zdata)
-    ax.view_init(45, 60)
-    
-def plot_kreis_XY(dataset, kreis, mx, my, fname="XY_Kreis_fitted.png"):
-    ax = plt.axes()
-    fig_kreis = plt.plot(dataset["x"], dataset["y"], '.',label="Positionen")
-    fig_kreis = plt.plot(mx, my, '.', label="Mittelpunkt", color="red")
-    fig_kreis = plt.plot(kreis["x"], kreis["y"], label="Kreis", color="red")
-    plt.axis('scaled')
-    plt.xlabel("X [m]")
-    plt.ylabel("Y [m]")
-    plt.title("Kreis in XY")
-    plt.savefig(fname)
-    plt.show()
+def plot_kreis_XY(dataset, kreis, mx, my, fname):
+    if create_plots == True:
+        ax = plt.axes()
+        fig_kreis = plt.plot(dataset["x"], dataset["y"], '.',label="Positionen")
+        fig_kreis = plt.plot(mx, my, '.', label="Mittelpunkt", color="red")
+        fig_kreis = plt.plot(kreis["x"], kreis["y"], label="Kreis", color="red")
+        plt.axis('scaled')
+        plt.xlabel("X [m]")
+        plt.ylabel("Y [m]")
+        plt.title("Kreis in XY")
+        plt.savefig(f"plots/{fname}_XY_Trajektorie.png")
+        plt.show()
 
 #%% 
 """
@@ -391,13 +391,17 @@ def plot_kreis_XY(dataset, kreis, mx, my, fname="XY_Kreis_fitted.png"):
 """
 
 def processing(filename):
+    
     # Aufbereitung der Daten
     accData, orData = data_preparation(filename)
     acc_time, acc_x, acc_y, acc_z, o_time, o_alpha, o_beta, o_gamma = synchronisierung(accData, orData)
     
+    # Entfernung der Dateiendung, damit plots problemfrei benannt werden
+    filename = (filename[:-4]).split("/")[2]
+        
     # Plotten der rohen Messwerte
-    plot_beschleunigung(acc_time, acc_x, acc_y, acc_z)
-    plot_orientierung(o_time, o_alpha, o_beta, o_gamma)
+    plot_beschleunigung(acc_time, acc_x, acc_y, acc_z, filename)
+    plot_orientierung(o_time, o_alpha, o_beta, o_gamma, filename)
     
     # Berechnungen:
         
@@ -410,7 +414,7 @@ def processing(filename):
     acc_v_z = calc_v(acc_z , delta_t_acc)
     
     # Plotten der errechneten Geschwindigkeiten
-    plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z)
+    plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z, filename)
     
     # Berechnung der zurückgelegten Strecke für jede Achse
     s_x = calc_s(delta_t_acc, acc_v_x)
@@ -431,18 +435,18 @@ def processing(filename):
     # Filterung, Glättung und Visualisierung der 2D Trajektorie
     dataset,mx,my = filter_trajektorie_2D(trajectorie_xy, limit=3)
     dataset = smooth_trajektorie_2D(dataset,3)
-    plot_trajektorie_xy(dataset, mx, my)
+    plot_trajektorie_xy(dataset, mx, my, filename)
     
     # Visualisierung der Trajektorie in 3D
-        #plot_trajektorie_xyz(trajectorie_xyz)
+    plot_trajektorie_xyz(trajectorie_xyz, filename)
     
     # Berechnung und Visualisierung eines Kreises in die XY-Trajektorie
     kreis, mx, my = berechne_kreis_XY(dataset)
-    plot_kreis_XY(dataset, kreis, mx, my)
+    plot_kreis_XY(dataset, kreis, mx, my, filename)
     
     # Berechnung der Standardabweichung zum Kreis
     mittlere_abweichung = diff_kreis_XY(trajectorie_xy, kreis, mx, my)
-    print(f"{filename}, Abweichung: {np.round(mittlere_abweichung,3)}")
+    print(f"{filename}, Abweichung: {np.round(mittlere_abweichung,3)}[m]")
     return(mittlere_abweichung)
 
 #%% 
@@ -458,4 +462,10 @@ d_kreise = np.mean([processing(filename) for filename in filelist_kreise])
 print("\nBerechnung der mittleren Abweichung vom Kreis für Kreuze: ")
 d_kreuze = np.mean([processing(filename) for filename in filelist_kreuze])
 
-print(f"\nMittlere Abweichungen:\nKreise: {np.mean(d_kreise)}\nKreuze: {np.mean(d_kreuze)}")
+print(f"\nMittlere Abweichungen:\nKreise: {np.mean(d_kreise)}[m]\nKreuze: {np.mean(d_kreuze)}[m]")
+
+#%% 
+"""
+##### Abruf des Hauptprogramms für eine einzelne Datei #####
+"""
+#processing("sensorData_KreisXYGross.txt")
