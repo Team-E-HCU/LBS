@@ -344,7 +344,21 @@ def plot_trajektorie_xy(dataset, mx, my, fname="XY-Trajektorie.png"):
     plt.show()
     
 def plot_trajektorie_xyz(trajectorie_xyz, fname="XYZ-Trajektorie.png"):
-    # Plot der 3D Trajektorie
+    """
+    
+
+    Muss noch ausgebessert werden.
+    ----------
+    trajectorie_xyz : TYPE
+        DESCRIPTION.
+    fname : TYPE, optional
+        DESCRIPTION. The default is "XYZ-Trajektorie.png".
+
+    Returns
+    -------
+    None.
+
+    """
     fig = plt.plot()
     ax = plt.axes(projection='3d')
     # Data for three-dimensional scattered points
@@ -382,8 +396,8 @@ def processing(filename):
     acc_time, acc_x, acc_y, acc_z, o_time, o_alpha, o_beta, o_gamma = synchronisierung(accData, orData)
     
     # Plotten der rohen Messwerte
-       #plot_beschleunigung(acc_time, acc_x, acc_y, acc_z)
-       #plot_orientierung(o_time, o_alpha, o_beta, o_gamma)
+    plot_beschleunigung(acc_time, acc_x, acc_y, acc_z)
+    plot_orientierung(o_time, o_alpha, o_beta, o_gamma)
     
     # Berechnungen:
         
@@ -396,7 +410,7 @@ def processing(filename):
     acc_v_z = calc_v(acc_z , delta_t_acc)
     
     # Plotten der errechneten Geschwindigkeiten
-        #plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z)
+    plot_geschwindigkeit(delta_t_acc, acc_v_x, acc_v_y, acc_v_z)
     
     # Berechnung der zurückgelegten Strecke für jede Achse
     s_x = calc_s(delta_t_acc, acc_v_x)
@@ -417,7 +431,7 @@ def processing(filename):
     # Filterung, Glättung und Visualisierung der 2D Trajektorie
     dataset,mx,my = filter_trajektorie_2D(trajectorie_xy, limit=3)
     dataset = smooth_trajektorie_2D(dataset,3)
-        #plot_trajektorie_xy(dataset, mx, my)
+    plot_trajektorie_xy(dataset, mx, my)
     
     # Visualisierung der Trajektorie in 3D
         #plot_trajektorie_xyz(trajectorie_xyz)
@@ -439,12 +453,9 @@ d_kreise = []
 d_kreuze = []
     
 print("Berechnung der mittleren Abweichung vom Kreis für Kreise: ")
-for filename in filelist_kreise:
-    d_kreise.append(processing(filename))
+d_kreise = np.mean([processing(filename) for filename in filelist_kreise])
     
 print("\nBerechnung der mittleren Abweichung vom Kreis für Kreuze: ")
-for filename in filelist_kreuze:
-    d_kreuze.append(processing(filename))
-    
+d_kreuze = np.mean([processing(filename) for filename in filelist_kreuze])
+
 print(f"\nMittlere Abweichungen:\nKreise: {np.mean(d_kreise)}\nKreuze: {np.mean(d_kreuze)}")
-    
