@@ -163,7 +163,7 @@ def calc_trajectory2D(position_data, rotation_data):
     last_value = {"x": 0.0, "y": 0.0, "z": 0.0}
     position_change = {"x": [], "y": [], "z": []}
     for xyz in ["x", "y", "z"]:
-        for i, e in enumerate(position_data[xyz]*100):
+        for i, e in enumerate(position_data[xyz]):
             position_change[xyz].append(e-last_value[xyz])
             last_value[xyz] = e
     trajectory = {"x": [0.0], "y": [0.0]}
@@ -185,7 +185,7 @@ def calc_trajectory3D(position_data, rotation_data):
     last_value = {"x": 0.0, "y": 0.0, "z": 0.0}
     position_change = {"x": [], "y": [], "z": []}
     for xyz in ["x", "y", "z"]:
-        for i, e in enumerate(position_data[xyz]*100):
+        for i, e in enumerate(position_data[xyz]):
             position_change[xyz].append(e-last_value[xyz])
             last_value[xyz] = e
     trajectory = {"x": [0.0], "y": [0.0], "z":[0.0]}
