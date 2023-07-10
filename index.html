@@ -47,15 +47,17 @@
 		const requestOptions = {
 		  method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-		  body: output
+		  body: {daten: output}
 		};
 
+    console.log(requestOptions);
     $("#result").html("Daten werden gesendet");
     fetch(url, requestOptions)
     .then(response => response.text())
     .then(result => {
-      // Behandle den empfangenen String
+
       console.log(result);
+
       $("#result").html(result);
     })
     .catch(error => {
@@ -87,7 +89,7 @@
 
 </head>
 <body>
-  <h1>Erkennung einer Kreisbewegung V1.5</h1>
+  <h1>Erkennung einer Kreisbewegung V1.6</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
