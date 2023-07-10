@@ -51,15 +51,15 @@
 		  body: JSON.stringify(data)
 		};
 
-		fetch(url, requestOptions)
-		  .then(response => response.json())
-		  .then(result => {
-			const responseVariable = result;
-			console.log(responseVariable);
-		  })
-		  .catch(error => {
-			console.error('Fehler:', error);
-		  });
+      fetch(url, requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      // Behandle den empfangenen String
+      console.log(result);
+    })
+    .catch(error => {
+      console.error('Fehler:', error);
+    });
 		
           // Datenvariablen bereinigen
           accData = "";
@@ -86,7 +86,7 @@
 
 </head>
 <body>
-  <h1>Erkennung einer Kreisbewegung V1.2</h1>
+  <h1>Erkennung einer Kreisbewegung V1.3</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
