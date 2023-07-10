@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Smartphonesensoren auslesen</title>
+  <title>Smartphonesensoren auslesen V1.1</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <style>
@@ -41,24 +41,20 @@
           output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
           output += orientationData;
 
-		// VON Hier
-
 		console.log("geht los");
 		const url="https://lukas-rene.de/cgi-bin/startserver.cgi";
-		const data = { daten: output }; // Die Daten, die du senden möchtest (als Objekt)
+		const data = { daten: output };
 
 		const requestOptions = {
 		  method: 'POST',
-		  headers: { 'Content-Type': 'application/json' },
 		  body: JSON.stringify(data)
 		};
 
 		fetch(url, requestOptions)
 		  .then(response => response.json())
 		  .then(result => {
-			// Hier kannst du die Antwort in einer Variable speichern
 			const responseVariable = result;
-			console.log(responseVariable); // Beispiel: Konsolenausgabe der Antwort
+			console.log(responseVariable);
 		  })
 		  .catch(error => {
 			console.error('Fehler:', error);
