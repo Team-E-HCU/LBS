@@ -50,11 +50,13 @@
 		  body: output
 		};
 
-      fetch(url, requestOptions)
+    $("#result").html("Daten werden gesendet");
+    fetch(url, requestOptions)
     .then(response => response.text())
     .then(result => {
       // Behandle den empfangenen String
       console.log(result);
+      $("#result").html(result);
     })
     .catch(error => {
       console.error('Fehler:', error);
@@ -85,7 +87,7 @@
 
 </head>
 <body>
-  <h1>Erkennung einer Kreisbewegung V1.4</h1>
+  <h1>Erkennung einer Kreisbewegung V1.5</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
