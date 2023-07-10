@@ -41,15 +41,13 @@
           output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
           output += orientationData;
 
-		console.log("geht los");
     console.log(output);
 		const url="https://lukas-rene.de/cgi-bin/classification.cgi";
-		const data = { daten: output };
 
 		const requestOptions = {
 		  method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-		  body: JSON.stringify(data)
+      headers: { 'Content-Type': 'text/plain' },
+		  body: output
 		};
 
       fetch(url, requestOptions)
