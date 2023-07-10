@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Smartphonesensoren auslesen V1.1</title>
+  <title>Smartphonesensoren auslesen</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <style>
@@ -47,6 +47,7 @@
 
 		const requestOptions = {
 		  method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
 		  body: JSON.stringify(data)
 		};
 
@@ -60,9 +61,6 @@
 			console.error('Fehler:', error);
 		  });
 		
-		
-		// bis Hier
-
           // Datenvariablen bereinigen
           accData = "";
           orientationData = "";
@@ -88,7 +86,7 @@
 
 </head>
 <body>
-  <h1>Erkennung einer Kreisbewegung</h1>
+  <h1>Erkennung einer Kreisbewegung V1.2</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
