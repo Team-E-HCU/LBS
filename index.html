@@ -43,12 +43,9 @@
 
     console.log(output);
 		const url="https://lukas-rene.de/cgi-bin/classification.cgi";
-
-    const formData = new FormData();
-    formData.append('messungen', output);
     const requestOptions = {
       method: 'POST',
-      body: formData
+      body: output
     };
 
     console.log(requestOptions);
@@ -90,7 +87,7 @@
 
 </head>
 <body>
-  <h1>Erkennung einer Kreisbewegung V1.6.2</h1>
+  <h1>Erkennung einer Kreisbewegung V1.6.3</h1>
 
   <button id="startButton">Start</button>
   <button id="stopButton">Stop</button>
