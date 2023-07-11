@@ -1,0 +1,5 @@
+Acceleration Data 
+Time [ms], x [m/s²], y [m/s²], z [m/s²] 
+BREAK
+Orientation Data 
+Time [ms], x [°], y [°], z [°] 
