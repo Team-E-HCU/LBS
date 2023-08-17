@@ -131,13 +131,26 @@ def phasenkorrektur(timestamps, vergleichsdaten, neumessung):
 
     return(timestamps)
 
+def korrelationskoeffizient(x, y):
+    n = len(x)
+    mean_x = sum(x) / n
+    mean_y = sum(y) / n
+    covariance = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y))
+    std_dev_x = (sum((xi - mean_x)**2 for xi in x) / n)**0.5
+    std_dev_y = (sum((yi - mean_y)**2 for yi in y) / n)**0.5
+    correlation_coefficient = covariance / (std_dev_x * std_dev_y)
+    
+    return correlation_coefficient
+
+
 def berechne_korrelation(neumessung, vergleichsmessung, __plots = False):
+    
     timestamps = np.array([i for i in range(len(neumessung))])
     timestamps_mittel = np.array([i for i in range(len(vergleichsmessung))])
     
     # Verschieben  
     timestamps = phasenkorrektur(timestamps, vergleichsmessung, neumessung)
-
+    
     # Bis wohin verschoben?
     # Timestamps dürfen nicht negativ sein
     if timestamps[0] < 0:
@@ -151,15 +164,15 @@ def berechne_korrelation(neumessung, vergleichsmessung, __plots = False):
     vergleichsmessung = vergleichsmessung[startwert:endwert]
  
     neumessung = np.interp(timestamps_mittel, timestamps, neumessung)
-
+    
     # Korrelation berechnen
     try: 
-            correlation_matrix = np.corrcoef(vergleichsmessung, neumessung)
-            correlation_coefficient = correlation_matrix[0, 1]
+            correlation_coefficient = korrelationskoeffizient(vergleichsmessung, neumessung)
     except:
         print("Berechnung der Korrelation nicht möglich")
         None
-       
+    
+
     return(correlation_coefficient)
 
 def umwandlung_orientierungsdaten(data):    
@@ -171,6 +184,7 @@ def umwandlung_orientierungsdaten(data):
 
 
 def korrelation_orientierung(vergleichsmessung, neumessung):
+    
     neumessung = umwandlung_orientierungsdaten(neumessung)
     vergleichsmessung = umwandlung_orientierungsdaten(vergleichsmessung)
     
@@ -197,9 +211,11 @@ def klassifizierung(vergleichsmessung_kreis, vergleichsmessung_kreuz, neumessung
     c_acc_x_kreis = berechne_korrelation(acc_x, acc_x_kreis)
     c_acc_y_kreis = berechne_korrelation(acc_y, acc_y_kreis)
     c_acc_z_kreis = berechne_korrelation(acc_z, acc_z_kreis)
+
     c_o_alpha_kreis = korrelation_orientierung(o_alpha_kreis, o_alpha)
     c_o_beta_kreis = korrelation_orientierung(o_beta_kreis, o_beta)
     c_o_gamma_kreis = korrelation_orientierung(o_gamma_kreis, o_gamma)
+    
     
     c_acc_x_kreuz = berechne_korrelation(acc_x, acc_x_kreuz)
     c_acc_y_kreuz = berechne_korrelation(acc_y, acc_y_kreuz)
@@ -220,12 +236,6 @@ def klassifizierung(vergleichsmessung_kreis, vergleichsmessung_kreuz, neumessung
     mean_correlation_kreuze_acc = np.mean( np.abs(correlations["Kreuze_Acc"]))
     mean_correlation_kreuze_o = np.mean( np.abs(correlations["Kreuze_O"]))
     
-    """
-    print("Mean Kreise ACC: ", mean_correlation_kreise_acc)
-    print("Mean Kreise O: ", mean_correlation_kreise_o)
-    print("Mean Kreuze Acc: ", mean_correlation_kreuze_acc)
-    print("Mean Kreuze O: ", mean_correlation_kreuze_o)
-    """
     mean_correlation_kreise = (gewicht_acc * mean_correlation_kreise_acc + gewicht_or * mean_correlation_kreise_o)
     mean_correlation_kreuze = (gewicht_acc * mean_correlation_kreuze_acc + gewicht_or * mean_correlation_kreuze_o)
 
@@ -246,8 +256,8 @@ def klassifizierung(vergleichsmessung_kreis, vergleichsmessung_kreuz, neumessung
             
     else:
         result = "Nichts erkannt!"
-    
-    print(result)
+
+    return(result)
 
     
     
