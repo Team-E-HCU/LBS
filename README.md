@@ -1,2 +1,2 @@
-# Sensor-Data-Collection
-Collecting sensor data from smartphone sensors
+# Location Based Services
+Generierung von Sensordaten und Erkennung von Bewegungsmustern eines mobilen Endgerätes
