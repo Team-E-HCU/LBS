@@ -1,15 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Startseite</title>
+  <meta charset="UTF-8">
+  <title>Bewegungsmustererkennung</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<h1>LBS: Creating a Pilot 2</h1>
-<p>Diese Anwendung wird aktuell gewartet. Ziel: Zugriff auf IOS erlauben</p>
+  <h1>Mustererkennung</h1>
 
+	<h3>Referenzmessungen:</h3>
+  <button id="startCircleButton">Start Kreis</button> <button id="stopCircleButton">Stop Kreis</button> <p>Warten auf Eingabe: Kreis</p> <br> <br>
+  <button id="startCrossButton">Start Kreuz</button>  <button id="stopCrossButton">Stop Kreuz</button> <p>Warten auf Eingabe: Kreuz</p> <br>
 
+	<h3>Neumessung:</h3>
+
+	<p>Warten auf Referenzmuster</p>
+  <button id="startCompareButton">Start</button> <button id="stopCompareButton">Stop</button>	<br> 
+  <p id="result" >Ergebnis<span class="sensor-value"></span></p> <br> <br>
+  
+  <button id="resetButton">Reset</button>
+
+  <script>
+    $(document).ready(function() {
+      var accData = "";
+      var orientationData = "";
+      var output = "";
+	  var referenzKreis = "";
+	  var referenzKreuz = "";
+	  
+	  
+		// Funktion für Start-Button-Kreis
+      $("#startCircleButton").click(function() {
+          // Daten auslesen starten
+          console.log("start listening...");
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("devicemotion", handleMotion, true);
+		});
+	  
+      // Funktion für Stop-Button-Kreis
+      $("#stopCircleButton").click(function() {
+        // Daten auslesen beenden
+        console.log("Stop listening...");
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+		
+		// Gesammelte Daten in txt-Datei schreiben und an API schicken anbieten
+          /* Beide Datensätze müssen in eine TXT Datei geschrieben werden, da das Smartphone nur eine Datei herunterladen kann */
+          /* Als Trennzeichen zwischen Beschleunigungs und Orientierungsdaten für die Weiterverarbeitung wird BREAK genutzt */
+          output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
+          output += accData;
+          output += "BREAK\n"
+          output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
+          output += orientationData;
+		  
+		  referenzKreis = output;
+		  output = "";
+		  accData = "";
+		  orientationData = "";
+		  console.log("Kreis Daten gespeichert!")
+		});
+		
+	// Funktion für Start-Button-Kreuz
+      $("#startCrossButton").click(function() {
+          // Daten auslesen starten
+          console.log("start listening...");
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("devicemotion", handleMotion, true);
+		});
+	  
+      // Funktion für Stop-Button-Kreuz
+      $("#stopCrossButton").click(function() {
+        // Daten auslesen beenden
+        console.log("Stop listening...");
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+		
+		// Gesammelte Daten in txt-Datei schreiben und an API schicken anbieten
+          /* Beide Datensätze müssen in eine TXT Datei geschrieben werden, da das Smartphone nur eine Datei herunterladen kann */
+          /* Als Trennzeichen zwischen Beschleunigungs und Orientierungsdaten für die Weiterverarbeitung wird BREAK genutzt */
+          output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
+          output += accData;
+          output += "BREAK\n"
+          output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
+          output += orientationData;
+		  
+		  referenzKreuz = output;
+		  output = "";
+		  accData = "";
+		  orientationData = "";
+		  console.log("Kreuz Daten gespeichert!")
+		});
+		
+	// Funktion für Start-Button-Neumessung
+      $("#startCompareButtonButton").click(function() {
+          // Daten auslesen starten
+          console.log("start listening...");
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("devicemotion", handleMotion, true);
+		});
+	  
+      // Funktion für Stop-Button-Neumessung
+      $("#stopCompareButton").click(function() {
+        // Daten auslesen beenden
+        console.log("Stop listening...");
+        window.removeEventListener("deviceorientation", handleOrientation, true);
+        window.removeEventListener("devicemotion", handleMotion, true);
+		
+		// Gesammelte Daten in txt-Datei schreiben und an API schicken anbieten
+          /* Beide Datensätze müssen in eine TXT Datei geschrieben werden, da das Smartphone nur eine Datei herunterladen kann */
+          /* Als Trennzeichen zwischen Beschleunigungs und Orientierungsdaten für die Weiterverarbeitung wird BREAK genutzt */
+          output = "Acceleration Data \nTime [ms], x [m/s²], y [m/s²], z [m/s²] \n";
+          output += accData;
+          output += "BREAK\n"
+          output += "Orientation Data \nTime [ms], x [°], y [°], z [°] \n";
+          output += orientationData;
+		  
+		  console.log("Neue Bewegung gespeichert!")
+		
+			// Senden an API
+			const url = "https://lukas-rene.de/cgi-bin/classification.cgi";
+			const data = [referenzKreis, referenzKreuz, output];
+
+			const requestOptions = {
+			  method: 'POST',
+			  headers: { 'Content-Type': 'application/json' },
+			  body: JSON.stringify(data, null, 2)
+			};
+			
+			console.log(requestOptions);
+
+			fetch(url, requestOptions)
+			  .then(response => response.text())
+			  .then(result => {
+				const responseVariable = result;
+				$("#result").html(responseVariable);
+				console.log("Antwort: ", responseVariable);
+			  })
+			  .catch(error => {
+				console.error('Fehler:', error);
+			  });
+			  
+			
+
+			// Neumessung zurücksetzen 
+			output = "";
+			accData = "";
+			orientationData = "";
+		});
+		
+	      // Funktion Handle Orientierungsänderung
+		  function handleOrientation(event_or) {
+		  var alpha = event_or.alpha; // Z-Achse (Yaw)
+		  var beta = event_or.beta; // X-Achse (Pitch)
+		  var gamma = event_or.gamma; // Y-Achse (Roll)
+		  orientationData += Date.now() + "," + alpha + "," + beta + "," + gamma + "\n";
+		  }
+
+		  // Funktion Handle Beschleunigungsänderung
+		  function handleMotion(event_acc) {
+		  var x = event_acc.acceleration.x; // Beschleunigung in x-Richtung
+		  var y = event_acc.acceleration.y; // Beschleunigung in y-Richtung
+		  var z = event_acc.acceleration.z; // Beschleunigung in z-Richtung
+		  accData += Date.now() + "," + x + "," + y + "," + z + "\n";
+		  }
+	});
+  </script>
 
 </body>
 </html>
