@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Bewegungsmustererkennung</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+	
 </head>
 <body>
   <h1>Mustererkennung</h1>
@@ -27,15 +31,42 @@
 	  var referenzKreis = "";
 	  var referenzKreuz = "";
 	  
-	  
 		// Funktion für Start-Button-Kreis ###########################################
-      $("#startCircleButton").click(function() {
-          // Daten auslesen starten
-          console.log("start listening...");
-          window.addEventListener("deviceorientation", handleOrientation, true);
-          window.addEventListener("devicemotion", handleMotion, true);
+		$("#startCircleButton").click(function() {
+			// Daten auslesen starten
+			console.log("start listening...");
+			if (window.DeviceOrientationEvent && window.DeviceMotionEvent) {
+				// Berechtigungen prüfen
+				if (typeof DeviceMotionEvent.requestPermission === 'function' &&
+					typeof DeviceOrientationEvent.requestPermission === 'function') {
+					DeviceMotionEvent.requestPermission()
+						.then(permissionState => {
+							if (permissionState === 'granted') {
+								DeviceOrientationEvent.requestPermission()
+									.then(permissionState => {
+										if (permissionState === 'granted') {
+											window.addEventListener("deviceorientation", handleOrientation, true);
+											window.addEventListener("devicemotion", handleMotion, true);
+										} else {
+											console.error('Zugriff auf Orientierungssensoren verweigert.');
+										}
+									})
+									.catch(console.error);
+							} else {
+								console.error('Zugriff auf Bewegungssensoren verweigert.');
+							}
+						})
+						.catch(console.error);
+				} else {
+					// Wenn keine Berechtigungsanfragen unterstützt werden (ältere Safari-Versionen)
+					window.addEventListener("deviceorientation", handleOrientation, true);
+					window.addEventListener("devicemotion", handleMotion, true);
+				}
+			} else {
+				console.error('Bewegungs- oder Orientierungssensoren werden nicht unterstützt.');
+			}
 		});
-	  
+
       // Funktion für Stop-Button-Kreis ###########################################
       $("#stopCircleButton").click(function() {
         // Daten auslesen beenden
