@@ -9,12 +9,11 @@
   <h1>Mustererkennung</h1>
 
 	<h3>Referenzmessungen:</h3>
-  <button id="startCircleButton">Start Kreis</button> <button id="stopCircleButton">Stop Kreis</button> <p>Warten auf Eingabe: Kreis</p> <br> <br>
-  <button id="startCrossButton">Start Kreuz</button>  <button id="stopCrossButton">Stop Kreuz</button> <p>Warten auf Eingabe: Kreuz</p> <br>
+  <button id="startCircleButton">Start Kreis</button> <button id="stopCircleButton">Stop Kreis</button> <p id="statusKreis">Warten auf Eingabe: Kreis</p> <br> <br>
+  <button id="startCrossButton">Start Kreuz</button>  <button id="stopCrossButton">Stop Kreuz</button> <p id="statusKreuz">Warten auf Eingabe: Kreuz</p> <br>
 
 	<h3>Neumessung:</h3>
 
-	<p>Warten auf Referenzmuster</p>
   <button id="startCompareButton">Start</button> <button id="stopCompareButton">Stop</button>	<br> 
   <p id="result" >Ergebnis<span class="sensor-value"></span></p> <br> <br>
   
@@ -29,7 +28,7 @@
 	  var referenzKreuz = "";
 	  
 	  
-		// Funktion für Start-Button-Kreis
+		// Funktion für Start-Button-Kreis ###########################################
       $("#startCircleButton").click(function() {
           // Daten auslesen starten
           console.log("start listening...");
@@ -37,7 +36,7 @@
           window.addEventListener("devicemotion", handleMotion, true);
 		});
 	  
-      // Funktion für Stop-Button-Kreis
+      // Funktion für Stop-Button-Kreis ###########################################
       $("#stopCircleButton").click(function() {
         // Daten auslesen beenden
         console.log("Stop listening...");
@@ -58,9 +57,10 @@
 		  accData = "";
 		  orientationData = "";
 		  console.log("Kreis Daten gespeichert!")
+		  $("#statusKreis").html("Kreis gespeichert!");
 		});
 		
-	// Funktion für Start-Button-Kreuz
+	// Funktion für Start-Button-Kreuz ###########################################
       $("#startCrossButton").click(function() {
           // Daten auslesen starten
           console.log("start listening...");
@@ -68,7 +68,7 @@
           window.addEventListener("devicemotion", handleMotion, true);
 		});
 	  
-      // Funktion für Stop-Button-Kreuz
+      // Funktion für Stop-Button-Kreuz ###########################################
       $("#stopCrossButton").click(function() {
         // Daten auslesen beenden
         console.log("Stop listening...");
@@ -89,19 +89,21 @@
 		  accData = "";
 		  orientationData = "";
 		  console.log("Kreuz Daten gespeichert!")
+		  $("#statusKreuz").html("Kreuz gespeichert!");
 		});
 		
-	// Funktion für Start-Button-Neumessung
-      $("#startCompareButtonButton").click(function() {
+	// Funktion für Start-Button-Neumessung ###########################################
+      $("#startCompareButton").click(function() {
           // Daten auslesen starten
           console.log("start listening...");
           window.addEventListener("deviceorientation", handleOrientation, true);
           window.addEventListener("devicemotion", handleMotion, true);
 		});
 	  
-      // Funktion für Stop-Button-Neumessung
+      // Funktion für Stop-Button-Neumessung ###########################################
       $("#stopCompareButton").click(function() {
         // Daten auslesen beenden
+		$("#result").html("Berechne...");
         console.log("Stop listening...");
         window.removeEventListener("deviceorientation", handleOrientation, true);
         window.removeEventListener("devicemotion", handleMotion, true);
@@ -146,6 +148,24 @@
 			output = "";
 			accData = "";
 			orientationData = "";
+		});
+		
+	  // Funktion für Reset-Button ###########################################
+      $("#resetButton").click(function() {
+        // Daten auslesen beenden
+		console.log("Zurücksetzen");
+		 
+		  accData = "";
+		  orientationData = "";
+		  output = "";
+		  referenzKreis = "";
+		  referenzKreuz  = "";
+		  
+		  
+		  $("#statusKreis").html("Warten auf Eingabe: Kreis");
+		  $("#statusKreuz").html("Warten auf Eingabe: Kreuz");
+		  $("#result").html("Ergebnis");
+		  console.log("Zurückgesetzt")
 		});
 		
 	      // Funktion Handle Orientierungsänderung
